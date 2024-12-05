@@ -39,9 +39,9 @@ public class AvgLatencyService {
             ));
     }
 
-    private List<ServiceInfo> calculateAvgLatencyByService(Map<String, RequestInfo> uniqueReuqestInfo) {
-        return uniqueReuqestInfo.values().stream()
-            .collect(Collectors.groupingBy(RequestInfo::getServiceId)) // Group by serviceId
+    private List<ServiceInfo> calculateAvgLatencyByService(Map<String, RequestInfo> requestInfo) {
+        return requestInfo.values().stream()
+            .collect(Collectors.groupingBy(RequestInfo::getServiceId))
             .entrySet().stream()
             .map(entry -> {
                 long serviceId = entry.getKey();

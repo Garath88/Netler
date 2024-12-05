@@ -14,10 +14,10 @@ public final class DateRangeParser {
 
     public static List<String> getDateRange(String startDate, String endDate) throws IllegalArgumentException {
         List<String> dateList = new ArrayList<>();
+
         LocalDate start = DateRangeParser.validateAndParse(startDate, "startDate");
         LocalDate end = DateRangeParser.validateAndParse(endDate, "endDate");
         DateRangeParser.validateDateRange(start, end);
-
         while (!start.isAfter(end)) {
             dateList.add(start.toString());
             start = start.plusDays(1);
