@@ -11,6 +11,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,6 +31,12 @@ public final class RequestInfoClientImpl implements RequestInfoClient {
             for (String date : dateRange) {
                 responseData.addAll(getRequestInfo(date));
             }
+            if (responseData.isEmpty()) {
+                String errorMessage = "No data found for the specified date range: " + startDate + " to " + endDate;
+                LOGGER.error(errorMessage);
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+            }
+
         } catch (IllegalArgumentException e) {
             LOGGER.error(e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -38,12 +45,19 @@ public final class RequestInfoClientImpl implements RequestInfoClient {
     }
 
     private Set<RequestInfo> getRequestInfo(String date) {
-        return REST_CLIENT.get()
-            .uri(URI_BASE + "?date={date}", date)
-            .accept(MediaType.APPLICATION_JSON)
-            .retrieve()
-            .body(new ParameterizedTypeReference<>() {
-            });
+        try {
+            return REST_CLIENT.get()
+                .uri(URI_BASE + "?date={date}", date)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
+        } catch (HttpServerErrorException e) {
+            LOGGER.error("API returned 500 for date {}", date);
+            return Collections.emptySet();
+        } catch (Exception e) {
+            LOGGER.error("Unexpected error occurred for date {}: {}", date, e.getMessage());
+            throw e; // Rethrow other exceptions
+        }
     }
-
 }
