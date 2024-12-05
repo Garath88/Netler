@@ -32,7 +32,8 @@ public final class RequestInfoClientImpl implements RequestInfoClient {
                 responseData.addAll(getRequestInfo(date));
             }
             if (responseData.isEmpty()) {
-                String errorMessage = "No data found for the specified date range: " + startDate + " to " + endDate;
+                String errorMessage = String.format("No data found for the specified date range: %s to %s",
+                    startDate, endDate);
                 LOGGER.error(errorMessage);
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
             }
