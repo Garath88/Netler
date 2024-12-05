@@ -1,0 +1,8 @@
+spring:
+  jackson:
+    default-property-inclusion: non_null
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: false
+server:
+  error:
+    include-message: always
